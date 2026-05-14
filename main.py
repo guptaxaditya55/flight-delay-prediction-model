@@ -33,6 +33,7 @@ class FlightData(BaseModel):
     dest: str
     distance: float
     dep_hour: int
+# lets start the prediction function 
 
 # 4. Create the Prediction Endpoint
 @app.post("/predict")
