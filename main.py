@@ -5,12 +5,12 @@ import pandas as pd
 import joblib
 
 # 1. Initialize FastAPI App
-app = FastAPI(title="Flight Delay API", version="1.0")
+app = FastAPI(title="SkySight Flight API", version="1.0")
 
 # Allow frontend to communicate with backend (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, put your frontend domain here
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,11 +20,11 @@ app.add_middleware(
 try:
     model = joblib.load('flight_delay_xgboost_model.pkl')
     encoders = joblib.load('label_encoders.pkl')
-    print("✅ Models loaded successfully!")
+    print("✅ ATC Uplink established (Models loaded)!")
 except Exception as e:
-    print(f"❌ Error loading models: {e}")
+    print(f"❌ Connection failed. Check file placement: {e}")
 
-# 3. Define Input Data Schema (Data Validation - The SDE Way!)
+# 3. Define Input Data Schema
 class FlightData(BaseModel):
     month: int
     day_of_week: int
@@ -33,7 +33,6 @@ class FlightData(BaseModel):
     dest: str
     distance: float
     dep_hour: int
-# lets start the prediction function 
 
 # 4. Create the Prediction Endpoint
 @app.post("/predict")
@@ -41,14 +40,19 @@ def predict_delay(data: FlightData):
     try:
         # Edge Case checking
         if data.origin == data.dest:
-            raise HTTPException(status_code=400, detail="Origin and Destination cannot be the same!")
+            raise HTTPException(status_code=400, detail="Origin and Destination cannot be the same.")
+
+        if data.airline not in encoders['Marketing_Airline_Network'].classes_ or \
+           data.origin not in encoders['Origin'].classes_ or \
+           data.dest not in encoders['Dest'].classes_:
+             raise HTTPException(status_code=404, detail="Invalid Airline/Origin/Destination ID. Data unknown.")
 
         # A. Encode Categorical Data
         encoded_airline = encoders['Marketing_Airline_Network'].transform([data.airline])[0]
         encoded_origin = encoders['Origin'].transform([data.origin])[0]
         encoded_dest = encoders['Dest'].transform([data.dest])[0]
 
-        # B. Prepare DataFrame exactly as the model expects
+        # B. Prepare DataFrame
         input_df = pd.DataFrame({
             'Month': [data.month],
             'DayOfWeek': [data.day_of_week],
@@ -59,17 +63,17 @@ def predict_delay(data: FlightData):
             'DepHour': [data.dep_hour]
         })
 
-        # C. Make Prediction
+        # C. Make Prediction and Probability
         prediction = int(model.predict(input_df)[0])
         probability = float(model.predict_proba(input_df)[0][1]) * 100
 
-        # D. Return JSON Response
+        # D. Return Response
         return {
             "status": "success",
             "is_delayed": bool(prediction == 1),
             "delay_probability": round(probability, 2),
-            "message": "High Chances of Delay 🚨" if prediction == 1 else "Flight is On-Time ✅"
+            "message": "WARNING: DELAY INTERCEPTED 🚨" if prediction == 1 else "CLEAR: PATH IS SAFE ✅"
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"SYSTEM ERROR: {str(e)}")
