@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Delay Predictor | Vecna's Gate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: #020000;
+            color: #d1d1d1;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 5vw;
+        }
+
+        /* VECNA FULL BACKGROUND */
+        #vecnaBg {
+            position: fixed; inset: 0;
+            background-image: url('vecna.png');
+            background-size: cover;
+            background-position: center right;
+            opacity: 0;
+            z-index: 0;
+            transform: scale(1.05);
+        }
+
+        /* Dark gradient — heavy left so card is readable, fades right so Vecna is fully visible */
+        #vecnaOverlay {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: linear-gradient(
+                to right,
+                rgba(0,0,0,0.90) 0%,
+                rgba(0,0,0,0.65) 30%,
+                rgba(0,0,0,0.20) 60%,
+                rgba(0,0,0,0.00) 100%
+            );
+        }
+
+        /* Red atmospheric tint */
+        #redTint {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none;
+            background: radial-gradient(ellipse at 72% 55%, rgba(150,0,0,0.28) 0%, transparent 65%);
+            opacity: 0;
+        }
+
+        #lightning { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: transparent; }
+
+        #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+        .ember {
+            position: absolute; border-radius: 50%; bottom: -10px;
+            animation: driftUp linear infinite;
+        }
+        @keyframes driftUp {
+            0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+            20%  { opacity: 0.9; }
+            60%  { transform: translateY(-60vh) translateX(12px) scale(0.7); opacity: 0.6; }
+            100% { transform: translateY(-110vh) translateX(-8px) scale(0.2); opacity: 0; }
+        }
+
+        #vineSvg { position: fixed; inset: 0; z-index: 3; pointer-events: none; width: 100%; height: 100%; }
+
+        /* MAIN CARD */
+        .card {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 440px;
+            background: rgba(5, 0, 0, 0.82);
+            border: 1px solid #aa0000;
+            box-shadow: 0 0 50px rgba(180,0,0,0.3), 0 0 120px rgba(100,0,0,0.15), inset 0 0 40px rgba(60,0,0,0.25);
+            padding: 32px 36px 28px;
+            backdrop-filter: blur(14px);
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .card::after {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+            pointer-events: none; z-index: 20;
+        }
+
+        .rune { position: absolute; font-size: 16px; color: #4a0000; pointer-events: none; font-family: 'Cinzel', serif; }
+        .rune.tl { top: 7px; left: 10px; }
+        .rune.tr { top: 7px; right: 10px; }
+        .rune.bl { bottom: 7px; left: 10px; }
+        .rune.br { bottom: 7px; right: 10px; }
+
+        h2 {
+            text-align: center; font-family: 'Cinzel', serif; color: #ff1a1a;
+            text-shadow: 0 0 16px rgba(255,0,0,0.85), 0 0 40px rgba(255,0,0,0.25);
+            letter-spacing: 3px; margin: 0 0 6px; font-size: 21px;
+        }
+
+        .subtitle { text-align: center; font-size: 9px; color: #5a0000; letter-spacing: 5px; margin: 0 0 20px; }
+
+        hr.divider { border: none; border-top: 1px solid #3a0000; margin: 0 0 18px; }
+
+        .input-group { display: flex; gap: 12px; }
+        .input-wrapper { flex: 1; }
+
+        label { color: #bb2200; font-size: 9px; letter-spacing: 2px; display: block; margin-top: 12px; font-weight: bold; }
+
+        input, select {
+            width: 100%; padding: 9px 11px; margin-top: 4px;
+            background: rgba(10, 0, 0, 0.96); border: 1px solid #4a0000;
+            color: #ffbbbb; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s; outline: none;
+        }
+        input:focus, select:focus { border-color: #bb0000; box-shadow: 0 0 10px rgba(180,0,0,0.45); }
+        select option { background: #0a0000; }
+
+        button {
+            width: 100%; padding: 14px; margin-top: 22px;
+            background: #4a0000; color: #ffcccc; border: 1px solid #bb0000;
+            font-family: 'Cinzel', serif; font-weight: 900; font-size: 13px;
+            letter-spacing: 4px; cursor: pointer;
+            transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+            position: relative; overflow: hidden;
+        }
+        button::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,40,0,0.18), transparent);
+            transform: translateX(-100%); transition: transform 0.5s;
+        }
+        button:hover { background: #bb0000; color: #fff; box-shadow: 0 0 28px rgba(200,0,0,0.65), 0 0 55px rgba(200,0,0,0.2); }
+        button:hover::before { transform: translateX(100%); }
+        button:active { transform: scale(0.985); }
+
+        #resultBox {
+            margin-top: 18px; padding: 14px; text-align: center; display: none;
+            border: 1px solid #770000; background: rgba(12,0,0,0.92);
+            font-family: 'Cinzel', serif; color: #ff3333; font-size: 12px;
+            line-height: 1.8; letter-spacing: 1px;
+        }
+        .result-label { font-size: 9px; color: #660000; letter-spacing: 4px; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+
+<div id="vecnaBg"></div>
+<div id="vecnaOverlay"></div>
+<div id="redTint"></div>
+<div id="lightning"></div>
+<div id="particles"></div>
+<svg id="vineSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<div class="card" id="mainCard">
+    <span class="rune tl">ᚢ</span>
+    <span class="rune tr">ᚦ</span>
+    <span class="rune bl">ᚱ</span>
+    <span class="rune br">ᚷ</span>
+
+    <h2 id="titleText">FLIGHT DELAY PREDICTOR</h2>
+    <p class="subtitle">[ THE UPSIDE DOWN KNOWS ]</p>
+    <hr class="divider">
+
+    <div class="input-group">
+        <div class="input-wrapper">
+            <label>MONTH [01-12]</label>
+            <input type="number" id="month" value="12" min="1" max="12">
+        </div>
+        <div class="input-wrapper">
+            <label>DAY_OF_WEEK</label>
+            <select id="day">
+                <option value="0">MONDAY</option>
+                <option value="1">TUESDAY</option>
+                <option value="2">WEDNESDAY</option>
+                <option value="3">THURSDAY</option>
+                <option value="4" selected>FRIDAY</option>
+                <option value="5">SATURDAY</option>
+                <option value="6">SUNDAY</option>
+            </select>
+        </div>
+    </div>
+    <div class="input-group">
+        <div class="input-wrapper">
+            <label>ORIGIN_CODE</label>
+            <input type="text" id="origin" value="JFK">
+        </div>
+        <div class="input-wrapper">
+            <label>DEST_CODE</label>
+            <input type="text" id="dest" value="LAX">
+        </div>
+    </div>
+    <label>AIRLINE_ID</label>
+    <input type="text" id="airline" value="B6">
+    <div class="input-group">
+        <div class="input-wrapper">
+            <label>DISTANCE</label>
+            <input type="number" id="distance" value="2475">
+        </div>
+        <div class="input-wrapper">
+            <label>HOUR [0-23]</label>
+            <input type="number" id="dep_hour" value="18" min="0" max="23">
+        </div>
+    </div>
+    <button id="predictBtn" onclick="predictDelay()">SEEK THE TRUTH</button>
+    <div id="resultBox"></div>
+</div>
+
+<script>
+gsap.registerPlugin(TextPlugin);
+
+/* PARTICLES */
+const pCont = document.getElementById('particles');
+for (let i = 0; i < 65; i++) {
+    const p = document.createElement('div');
+    p.className = 'ember';
+    p.style.left = Math.random() * 100 + 'vw';
+    const sz = Math.random() * 3.5 + 1;
+    p.style.width = p.style.height = sz + 'px';
+    const c = Math.floor(Math.random() * 3);
+    p.style.backgroundColor = c === 0 ? '#ff2200' : c === 1 ? '#ff5500' : '#1a0000';
+    p.style.animationDuration = (Math.random() * 7 + 3) + 's';
+    p.style.animationDelay   = (Math.random() * 6) + 's';
+    pCont.appendChild(p);
+}
+
+/* VINES */
+const vSvg = document.getElementById('vineSvg');
+function vine(x1,y1,cpx,cpy,x2,y2,w,delay) {
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${x1},${y1} Q${cpx},${cpy} ${x2},${y2}`);
+    p.setAttribute('stroke','#1e0000'); p.setAttribute('stroke-width',w);
+    p.setAttribute('fill','none'); p.setAttribute('stroke-linecap','round');
+    p.style.strokeDasharray='400'; p.style.strokeDashoffset='400';
+    vSvg.appendChild(p);
+    gsap.to(p,{strokeDashoffset:0,duration:3,delay,ease:'power1.inOut'});
+}
+window.addEventListener('load',()=>{
+    const W=window.innerWidth, H=window.innerHeight;
+    vine(0,0,  80,100, 160,220, 2.5, 1.2);
+    vine(0,0,  40, 60,  90,150, 1.5, 1.5);
+    vine(0,0, 130, 30, 240, 80, 2.0, 1.8);
+    vine(W,0, W-100,120, W-200,260, 2.5, 1.4);
+    vine(W,0, W-50, 80, W-130,180, 1.5, 1.7);
+    vine(0,H, 100,H-130, 200,H-280, 2.0, 2.0);
+    vine(W,H, W-120,H-150, W-240,H-300, 2.0, 2.2);
+});
+
+/* ENTRANCE */
+const tl = gsap.timeline({defaults:{ease:'power2.out'}});
+tl.to('#vecnaBg',  {opacity:1, scale:1, duration:2.8, ease:'power1.inOut'})
+  .to('#redTint',  {opacity:1, duration:2, ease:'sine.inOut'}, '-=2.2')
+  .to('#mainCard', {opacity:1, x:0, duration:1.1, ease:'back.out(1.3)'}, '-=1.8')
+  .from('.rune',   {opacity:0, scale:0.4, stagger:0.12, duration:0.5}, '-=0.4');
+
+/* VECNA BREATHE — subtle scale pulse on the background */
+gsap.to('#vecnaBg', {
+    scale: 1.045, duration: 5,
+    yoyo:true, repeat:-1, ease:'sine.inOut',
+    transformOrigin:'center center'
+});
+
+/* RED TINT PULSE */
+gsap.to('#redTint', { opacity:0.65, duration:3.5, yoyo:true, repeat:-1, ease:'sine.inOut' });
+
+/* CARD GLOW PULSE */
+gsap.to('#mainCard', {
+    boxShadow:'0 0 70px rgba(200,0,0,0.45), 0 0 140px rgba(100,0,0,0.2), inset 0 0 50px rgba(80,0,0,0.3)',
+    duration:2.8, yoyo:true, repeat:-1, ease:'sine.inOut'
+});
+
+/* TITLE GLITCH */
+const ORIG   = 'FLIGHT DELAY PREDICTOR';
+const GCHARS = '█▓▒░Ж▲◈⌬✕ꙮ';
+function glitchTitle() {
+    const el = document.getElementById('titleText');
+    let n = 0;
+    const iv = setInterval(()=>{
+        let g = '';
+        for (let i=0;i<ORIG.length;i++)
+            g += ORIG[i]===' ' ? ' ' : Math.random()<0.18 ? GCHARS[Math.floor(Math.random()*GCHARS.length)] : ORIG[i];
+        el.textContent = g;
+        if (++n>9){ el.textContent=ORIG; clearInterval(iv); }
+    },55);
+}
+setInterval(glitchTitle,5500);
+setTimeout(glitchTitle,900);
+
+/* LIGHTNING */
+const lEl = document.getElementById('lightning');
+function flash(){
+    gsap.to(lEl,{backgroundColor:'rgba(255,20,0,0.18)',duration:0.04,
+        onComplete:()=>gsap.to(lEl,{backgroundColor:'transparent',duration:0.12})
+    });
+    setTimeout(flash, Math.random()*5500+1800);
+}
+setTimeout(flash,2500);
+
+/* PREDICT */
+async function predictDelay() {
+    const res = document.getElementById('resultBox');
+    res.style.display = 'block';
+    res.innerHTML = `<div class="result-label">OPENING THE GATE...</div>`;
+    gsap.fromTo(res,{opacity:0,y:8},{opacity:1,y:0,duration:0.45});
+
+    /* Vecna surges forward when button clicked */
+    gsap.to('#vecnaBg',{scale:1.10,duration:0.7,ease:'power2.inOut',
+        onComplete:()=>gsap.to('#vecnaBg',{scale:1,duration:2.2,delay:1.2,ease:'power2.out'})
+    });
+    gsap.to('#redTint',{opacity:0.9,duration:0.5,
+        onComplete:()=>gsap.to('#redTint',{opacity:0.4,duration:2,delay:1})
+    });
+
+    const data = {
+        month:       parseInt(document.getElementById('month').value),
+        day_of_week: parseInt(document.getElementById('day').value),
+        airline:     document.getElementById('airline').value.toUpperCase(),
+        origin:      document.getElementById('origin').value.toUpperCase(),
+        dest:        document.getElementById('dest').value.toUpperCase(),
+        distance:    parseFloat(document.getElementById('distance').value),
+        dep_hour:    parseInt(document.getElementById('dep_hour').value)
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/predict',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        gsap.to(res,{borderColor:'#bb0000',boxShadow:'0 0 18px rgba(180,0,0,0.45)',duration:0.4});
+        res.innerHTML = `
+            <div class="result-label">THE GATE HAS SPOKEN</div>
+            STATUS: ${result.message}<br>
+            PROBABILITY: ${result.delay_probability}%
+        `;
+    } catch(e) {
+        res.innerHTML = `<div class="result-label">SYSTEM ERROR</div>CONNECTION TO THE UPSIDE DOWN FAILED`;
+    }
+}
+</script>
+</body>
+</html>
