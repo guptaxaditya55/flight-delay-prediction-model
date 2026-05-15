@@ -22,6 +22,9 @@
             align-items: center;
             justify-content: flex-start;
             padding-left: 5vw;
+            
+            /* CUSTOM DEMOGORGON CURSOR */
+            cursor: url('target.png'), auto;
         }
 
         /* VECNA FULL BACKGROUND */
@@ -35,19 +38,11 @@
             transform: scale(1.05);
         }
 
-        /* Dark gradient — heavy left so card is readable, fades right so Vecna is fully visible */
         #vecnaOverlay {
             position: fixed; inset: 0; z-index: 1; pointer-events: none;
-            background: linear-gradient(
-                to right,
-                rgba(0,0,0,0.90) 0%,
-                rgba(0,0,0,0.65) 30%,
-                rgba(0,0,0,0.20) 60%,
-                rgba(0,0,0,0.00) 100%
-            );
+            background: linear-gradient(to right, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.65) 30%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.00) 100%);
         }
 
-        /* Red atmospheric tint */
         #redTint {
             position: fixed; inset: 0; z-index: 2; pointer-events: none;
             background: radial-gradient(ellipse at 72% 55%, rgba(150,0,0,0.28) 0%, transparent 65%);
@@ -55,7 +50,6 @@
         }
 
         #lightning { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: transparent; }
-
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
         .ember {
             position: absolute; border-radius: 50%; bottom: -10px;
@@ -102,7 +96,6 @@
         }
 
         .subtitle { text-align: center; font-size: 9px; color: #5a0000; letter-spacing: 5px; margin: 0 0 20px; }
-
         hr.divider { border: none; border-top: 1px solid #3a0000; margin: 0 0 18px; }
 
         .input-group { display: flex; gap: 12px; }
@@ -115,6 +108,9 @@
             background: rgba(10, 0, 0, 0.96); border: 1px solid #4a0000;
             color: #ffbbbb; font-family: 'Share Tech Mono', monospace; font-size: 14px;
             transition: border-color 0.3s, box-shadow 0.3s; outline: none;
+            
+            /* CUSTOM DEMOGORGON CURSOR FOR INPUTS */
+            cursor: url('demogorgon.png'), pointer;
         }
         input:focus, select:focus { border-color: #bb0000; box-shadow: 0 0 10px rgba(180,0,0,0.45); }
         select option { background: #0a0000; }
@@ -123,9 +119,11 @@
             width: 100%; padding: 14px; margin-top: 22px;
             background: #4a0000; color: #ffcccc; border: 1px solid #bb0000;
             font-family: 'Cinzel', serif; font-weight: 900; font-size: 13px;
-            letter-spacing: 4px; cursor: pointer;
-            transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+            letter-spacing: 4px; transition: background 0.25s, color 0.25s, box-shadow 0.25s;
             position: relative; overflow: hidden;
+            
+            /* CUSTOM DEMOGORGON CURSOR FOR BUTTON */
+            cursor: url('demogorgon.png'), pointer;
         }
         button::before {
             content: ''; position: absolute; inset: 0;
@@ -182,124 +180,40 @@
             </select>
         </div>
     </div>
+    
     <div class="input-group">
         <div class="input-wrapper">
             <label>ORIGIN_CODE</label>
             <select id="origin">
                 <option value="ATL">Atlanta (ATL)</option>
-                <option value="AUS">Austin (AUS)</option>
-                <option value="BNA">Nashville (BNA)</option>
                 <option value="BOS">Boston (BOS)</option>
-                <option value="BWI">Baltimore (BWI)</option>
-                <option value="CLT">Charlotte (CLT)</option>
-                <option value="DAL">Dallas Love Field (DAL)</option>
-                <option value="DCA">Washington Reagan (DCA)</option>
                 <option value="DEN">Denver (DEN)</option>
                 <option value="DFW">Dallas/Fort Worth (DFW)</option>
-                <option value="DTW">Detroit (DTW)</option>
-                <option value="EWR">Newark (EWR)</option>
-                <option value="FLL">Fort Lauderdale (FLL)</option>
-                <option value="HNL">Honolulu (HNL)</option>
-                <option value="HOU">Houston Hobby (HOU)</option>
-                <option value="IAD">Washington Dulles (IAD)</option>
-                <option value="IAH">Houston Intercontinental (IAH)</option>
                 <option value="JFK" selected>New York (JFK)</option>
                 <option value="LAS">Las Vegas (LAS)</option>
                 <option value="LAX">Los Angeles (LAX)</option>
-                <option value="LGA">New York LaGuardia (LGA)</option>
-                <option value="MCI">Kansas City (MCI)</option>
-                <option value="MCO">Orlando (MCO)</option>
-                <option value="MDW">Chicago Midway (MDW)</option>
-                <option value="MIA">Miami (MIA)</option>
-                <option value="MSP">Minneapolis (MSP)</option>
-                <option value="MSY">New Orleans (MSY)</option>
-                <option value="OAK">Oakland (OAK)</option>
                 <option value="ORD">Chicago O'Hare (ORD)</option>
-                <option value="PDX">Portland (PDX)</option>
-                <option value="PHL">Philadelphia (PHL)</option>
-                <option value="PHX">Phoenix (PHX)</option>
-                <option value="PIT">Pittsburgh (PIT)</option>
-                <option value="RDU">Raleigh-Durham (RDU)</option>
-                <option value="RSW">Fort Myers (RSW)</option>
-                <option value="SAN">San Diego (SAN)</option>
-                <option value="SAT">San Antonio (SAT)</option>
                 <option value="SEA">Seattle (SEA)</option>
                 <option value="SFO">San Francisco (SFO)</option>
-                <option value="SJC">San Jose (SJC)</option>
-                <option value="SJU">San Juan (SJU)</option>
-                <option value="SLC">Salt Lake City (SLC)</option>
-                <option value="SMF">Sacramento (SMF)</option>
-                <option value="STL">St. Louis (STL)</option>
-                <option value="TPA">Tampa (TPA)</option>
-                <option value="LHR">London Heathrow (LHR)</option>
-                <option value="CDG">Paris (CDG)</option>
-                <option value="FRA">Frankfurt (FRA)</option>
-                <option value="AMS">Amsterdam (AMS)</option>
-                <option value="DXB">Dubai (DXB)</option>
-                <option value="NRT">Tokyo Narita (NRT)</option>
-                <option value="SIN">Singapore (SIN)</option>
             </select>
         </div>
         <div class="input-wrapper">
             <label>DEST_CODE</label>
             <select id="dest">
                 <option value="ATL">Atlanta (ATL)</option>
-                <option value="AUS">Austin (AUS)</option>
-                <option value="BNA">Nashville (BNA)</option>
                 <option value="BOS">Boston (BOS)</option>
-                <option value="BWI">Baltimore (BWI)</option>
-                <option value="CLT">Charlotte (CLT)</option>
-                <option value="DAL">Dallas Love Field (DAL)</option>
-                <option value="DCA">Washington Reagan (DCA)</option>
                 <option value="DEN">Denver (DEN)</option>
                 <option value="DFW">Dallas/Fort Worth (DFW)</option>
-                <option value="DTW">Detroit (DTW)</option>
-                <option value="EWR">Newark (EWR)</option>
-                <option value="FLL">Fort Lauderdale (FLL)</option>
-                <option value="HNL">Honolulu (HNL)</option>
-                <option value="HOU">Houston Hobby (HOU)</option>
-                <option value="IAD">Washington Dulles (IAD)</option>
-                <option value="IAH">Houston Intercontinental (IAH)</option>
                 <option value="JFK">New York (JFK)</option>
                 <option value="LAS">Las Vegas (LAS)</option>
                 <option value="LAX" selected>Los Angeles (LAX)</option>
-                <option value="LGA">New York LaGuardia (LGA)</option>
-                <option value="MCI">Kansas City (MCI)</option>
-                <option value="MCO">Orlando (MCO)</option>
-                <option value="MDW">Chicago Midway (MDW)</option>
-                <option value="MIA">Miami (MIA)</option>
-                <option value="MSP">Minneapolis (MSP)</option>
-                <option value="MSY">New Orleans (MSY)</option>
-                <option value="OAK">Oakland (OAK)</option>
                 <option value="ORD">Chicago O'Hare (ORD)</option>
-                <option value="PDX">Portland (PDX)</option>
-                <option value="PHL">Philadelphia (PHL)</option>
-                <option value="PHX">Phoenix (PHX)</option>
-                <option value="PIT">Pittsburgh (PIT)</option>
-                <option value="RDU">Raleigh-Durham (RDU)</option>
-                <option value="RSW">Fort Myers (RSW)</option>
-                <option value="SAN">San Diego (SAN)</option>
-                <option value="SAT">San Antonio (SAT)</option>
                 <option value="SEA">Seattle (SEA)</option>
                 <option value="SFO">San Francisco (SFO)</option>
-                <option value="SJC">San Jose (SJC)</option>
-                <option value="SJU">San Juan (SJU)</option>
-                <option value="SLC">Salt Lake City (SLC)</option>
-                <option value="SMF">Sacramento (SMF)</option>
-                <option value="STL">St. Louis (STL)</option>
-                <option value="TPA">Tampa (TPA)</option>
-                <option value="LHR">London Heathrow (LHR)</option>
-                <option value="CDG">Paris (CDG)</option>
-                <option value="FRA">Frankfurt (FRA)</option>
-                <option value="AMS">Amsterdam (AMS)</option>
-                <option value="DXB">Dubai (DXB)</option>
-                <option value="NRT">Tokyo Narita (NRT)</option>
-                <option value="SIN">Singapore (SIN)</option>
             </select>
         </div>
     </div>
     
-    <!-- UPDATED: Airline Dropdown instead of Text Input -->
     <label>AIRLINE</label>
     <select id="airline">
         <option value="AA">American Airlines (AA)</option>
@@ -375,21 +289,10 @@ tl.to('#vecnaBg',  {opacity:1, scale:1, duration:2.8, ease:'power1.inOut'})
   .to('#mainCard', {opacity:1, x:0, duration:1.1, ease:'back.out(1.3)'}, '-=1.8')
   .from('.rune',   {opacity:0, scale:0.4, stagger:0.12, duration:0.5}, '-=0.4');
 
-/* VECNA BREATHE — subtle scale pulse on the background */
-gsap.to('#vecnaBg', {
-    scale: 1.045, duration: 5,
-    yoyo:true, repeat:-1, ease:'sine.inOut',
-    transformOrigin:'center center'
-});
-
-/* RED TINT PULSE */
+/* VECNA BREATHE */
+gsap.to('#vecnaBg', { scale: 1.045, duration: 5, yoyo:true, repeat:-1, ease:'sine.inOut', transformOrigin:'center center' });
 gsap.to('#redTint', { opacity:0.65, duration:3.5, yoyo:true, repeat:-1, ease:'sine.inOut' });
-
-/* CARD GLOW PULSE */
-gsap.to('#mainCard', {
-    boxShadow:'0 0 70px rgba(200,0,0,0.45), 0 0 140px rgba(100,0,0,0.2), inset 0 0 50px rgba(80,0,0,0.3)',
-    duration:2.8, yoyo:true, repeat:-1, ease:'sine.inOut'
-});
+gsap.to('#mainCard', { boxShadow:'0 0 70px rgba(200,0,0,0.45), 0 0 140px rgba(100,0,0,0.2), inset 0 0 50px rgba(80,0,0,0.3)', duration:2.8, yoyo:true, repeat:-1, ease:'sine.inOut' });
 
 /* TITLE GLITCH */
 const ORIG   = 'FLIGHT DELAY PREDICTOR';
@@ -411,9 +314,7 @@ setTimeout(glitchTitle,900);
 /* LIGHTNING */
 const lEl = document.getElementById('lightning');
 function flash(){
-    gsap.to(lEl,{backgroundColor:'rgba(255,20,0,0.18)',duration:0.04,
-        onComplete:()=>gsap.to(lEl,{backgroundColor:'transparent',duration:0.12})
-    });
+    gsap.to(lEl,{backgroundColor:'rgba(255,20,0,0.18)',duration:0.04, onComplete:()=>gsap.to(lEl,{backgroundColor:'transparent',duration:0.12}) });
     setTimeout(flash, Math.random()*5500+1800);
 }
 setTimeout(flash,2500);
@@ -425,18 +326,13 @@ async function predictDelay() {
     res.innerHTML = `<div class="result-label">OPENING THE GATE...</div>`;
     gsap.fromTo(res,{opacity:0,y:8},{opacity:1,y:0,duration:0.45});
 
-    /* Vecna surges forward when button clicked */
-    gsap.to('#vecnaBg',{scale:1.10,duration:0.7,ease:'power2.inOut',
-        onComplete:()=>gsap.to('#vecnaBg',{scale:1,duration:2.2,delay:1.2,ease:'power2.out'})
-    });
-    gsap.to('#redTint',{opacity:0.9,duration:0.5,
-        onComplete:()=>gsap.to('#redTint',{opacity:0.4,duration:2,delay:1})
-    });
+    gsap.to('#vecnaBg',{scale:1.10,duration:0.7,ease:'power2.inOut', onComplete:()=>gsap.to('#vecnaBg',{scale:1,duration:2.2,delay:1.2,ease:'power2.out'}) });
+    gsap.to('#redTint',{opacity:0.9,duration:0.5, onComplete:()=>gsap.to('#redTint',{opacity:0.4,duration:2,delay:1}) });
 
     const data = {
         month:       parseInt(document.getElementById('month').value),
         day_of_week: parseInt(document.getElementById('day').value),
-        airline:     document.getElementById('airline').value.toUpperCase(),
+        airline:     document.getElementById('airline').value,
         origin:      document.getElementById('origin').value,
         dest:        document.getElementById('dest').value,
         distance:    parseFloat(document.getElementById('distance').value),

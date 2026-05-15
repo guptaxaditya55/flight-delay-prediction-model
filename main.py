@@ -5,7 +5,7 @@ import pandas as pd
 import joblib
 
 # 1. Initialize FastAPI App
-app = FastAPI(title="SkySight Flight API", version="1.0")
+app = FastAPI(title="Hawkins Lab Flight API", version="19.83")
 
 # Allow frontend to communicate with backend (CORS)
 app.add_middleware(
@@ -20,7 +20,7 @@ app.add_middleware(
 try:
     model = joblib.load('flight_delay_xgboost_model.pkl')
     encoders = joblib.load('label_encoders.pkl')
-    print("✅ ATC Uplink established (Models loaded)!")
+    print("✅ Uplink established with the Upside Down (Models loaded)!")
 except Exception as e:
     print(f"❌ Connection failed. Check file placement: {e}")
 
@@ -38,9 +38,8 @@ class FlightData(BaseModel):
 @app.post("/predict")
 def predict_delay(data: FlightData):
     try:
-        # Edge Case checking
         if data.origin == data.dest:
-            raise HTTPException(status_code=400, detail="Origin and Destination cannot be the same.")
+            raise HTTPException(status_code=400, detail="Origin and Dest cannot be the same. Spacetime anomaly!")
 
         if data.airline not in encoders['Marketing_Airline_Network'].classes_ or \
            data.origin not in encoders['Origin'].classes_ or \
